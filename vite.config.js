@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
     //   },
     },
     build: {
-      outDir: "./dist", // 构建输出目录  
+      outDir: "./dist", // 构建输出目录
     },
     preview: {
       host: "0.0.0.0", // 绑定所有网络接口

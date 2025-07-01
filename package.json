@@ -1,0 +1,19 @@
+{
+  "name": "webgl-tutorial-online",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "sass": "^1.89.2",
+    "vite": "^7.0.0"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.8",
+    "prismjs": "^1.30.0"
+  }
+}

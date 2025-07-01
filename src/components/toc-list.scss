@@ -1,0 +1,77 @@
+#toc-list-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch; /* 让子元素尽可能宽 */
+  padding: 10px;
+  background-color: #2d2d2d;
+  border-right: 1px solid #444;
+  box-sizing: border-box;
+  overflow-y: auto; /* 如果内容超出容器高度则启用滚动 */
+  gap: 10px;
+
+  .header-section {
+    display: flex;
+    flex-direction: column; /* 改为列布局，使内容上下排列 */
+    justify-content: flex-start;
+    width: 100%;
+    margin-bottom: 10px; /* 给下面的内容留出空间 */
+
+    h2 {
+      color: #f5f5f5; /* 浅灰色文字颜色 */
+      font-size: 20px;
+      margin: 0;
+    }
+
+    .sub-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px; /* 上方留出一些空间 */
+
+      .author {
+        color: #888; /* 比标题浅一点的颜色，但比背景深 */
+        font-size: 14px;
+      }
+
+      .home-link {
+        color: #00c6ff; /* 更亮的蓝色，以提高对比度 */
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .home-link:hover {
+        color: #0097c9; /* 悬停时更深一点的蓝色 */
+      }
+    }
+  }
+
+  .toc-item {
+    display: flex;
+    flex-direction: row; /* 改为行布局，图标和文字并排 */
+    align-items: center; /* 垂直居中对齐 */  
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background-color: #3a3a3a; /* 卡片背景颜色 */
+    border: 1px solid #555; /* 更深一些的灰，比 #444 稍亮，但又不突兀 */
+
+    .toc-icon {
+      width: 32px;
+      height: 32px;
+      margin-right: 10px; /* 图标与文本之间留出空间 */
+    }
+
+    .toc-title {
+      color: #f5f5f5; /* 文字颜色 */
+      font-size: 16px;
+      line-height: 1.2;
+    }
+  }
+
+  .toc-item:hover {
+    border-color: #00c6ff; /* 使用主题色亮蓝作为悬停边框色 */
+    box-shadow: 0 4px 14px rgba(0, 198, 255, 0.2); /* 配合轻微发光效果 */
+  }
+}

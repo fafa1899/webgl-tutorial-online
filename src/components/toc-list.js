@@ -6,23 +6,23 @@ function loadTocList() {
   const cases = [
     {
       title: "第一篇：第一个简单示例",
-      url: "/public/case/hello-point.html",
-      cover: "/public/case/hello-point.jpg",
+      url: "/case/hello-point.html",
+      cover: "/case/hello-point.jpg",
     },
     {
       title: "第二篇：向着色器传输数据",
-      url: "/public/case/data-to-shader.html",
-      cover: "/public/case/data-to-shader.png",
+      url: "/case/data-to-shader.html",
+      cover: "/case/data-to-shader.png",
     },
     {
       title: "第三篇：绘制一个三角形(缓冲区对象)",
-      url: "/public/case/hello-triangle.html",
-      cover: "/public/case/hello-triangle.png",
+      url: "/case/hello-triangle.html",
+      cover: "/case/hello-triangle.png",
     },
     {
       title: "第四篇：颜色",
-      url: "/public/case/colored-triangle.html",
-      cover: "/public/case/colored-triangle.png",
+      url: "/case/colored-triangle.html",
+      cover: "/case/colored-triangle.png",
     },
   ];
 

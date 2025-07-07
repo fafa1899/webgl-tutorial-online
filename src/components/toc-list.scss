@@ -49,7 +49,7 @@
   .toc-item {
     display: flex;
     flex-direction: row; /* 改为行布局，图标和文字并排 */
-    align-items: center; /* 垂直居中对齐 */  
+    align-items: center; /* 垂直居中对齐 */
     padding: 10px;
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -73,5 +73,12 @@
   .toc-item:hover {
     border-color: #00c6ff; /* 使用主题色亮蓝作为悬停边框色 */
     box-shadow: 0 4px 14px rgba(0, 198, 255, 0.2); /* 配合轻微发光效果 */
+  }
+
+  .toc-item.selected {
+    border-color: #00c6ff !important;
+    box-shadow: 0 0 0 0 rgba(0, 198, 255, 0.6),
+      0 4px 14px rgba(0, 198, 255, 0.4) !important;
+    background-color: #3f3f3f !important; /* 稍微提亮背景以突出边框 */
   }
 }

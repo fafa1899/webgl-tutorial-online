@@ -24,4 +24,9 @@ export const caseData = [
     url: "/case/hello-3d.html",
     cover: "/case/hello-3d.png",
   },
+  {
+    title: "第七篇：绘制一个矩形体",
+    url: "/case/draw-cuboid.html",
+    cover: "/case/draw-cuboid.png",
+  },
 ];

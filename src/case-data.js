@@ -20,7 +20,7 @@ export const caseData = [
     cover: "/case/colored-triangle.png",
   },
   {
-    title: "第五篇：第一个三维示例(使用模型视图投影变换)",
+    title: "第六篇：第一个三维示例(使用模型视图投影变换)",
     url: "/case/hello-3d.html",
     cover: "/case/hello-3d.png",
   },

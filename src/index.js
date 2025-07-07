@@ -15,11 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  const event = new CustomEvent("toc-item-clicked", {
-    detail: {
-      url: caseData[id].url,
-      title: caseData[id].title,
-    },
-  });
-  window.dispatchEvent(event); // 触发事件
+  const target = document.querySelector(`.toc-item[data-id="${id}"]`);
+  if (target) {
+    target.click(); // 原生 click() 方法会触发绑定的事件监听器
+  } 
 });

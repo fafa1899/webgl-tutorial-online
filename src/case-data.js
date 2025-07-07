@@ -19,4 +19,9 @@ export const caseData = [
     url: "/case/colored-triangle.html",
     cover: "/case/colored-triangle.png",
   },
+  {
+    title: "第五篇：第一个三维示例(使用模型视图投影变换)",
+    url: "/case/hello-3d.html",
+    cover: "/case/hello-3d.png",
+  },
 ];

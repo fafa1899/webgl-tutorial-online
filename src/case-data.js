@@ -34,4 +34,9 @@ export const caseData = [
     url: "/case/interaction.html",
     cover: "/case/interaction.gif",
   },
+  {
+    title: "第九篇：综合实例：地形的绘制",
+    url: "/case/terrain-viewer.html",
+    cover: "/case/terrain-viewer.png",
+  },
 ];

@@ -29,4 +29,9 @@ export const caseData = [
     url: "/case/draw-cuboid.html",
     cover: "/case/draw-cuboid.png",
   },
+  {
+    title: "第八篇：三维场景交互",
+    url: "/case/interaction.html",
+    cover: "/case/interaction.gif",
+  },
 ];

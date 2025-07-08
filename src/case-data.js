@@ -39,4 +39,9 @@ export const caseData = [
     url: "/case/terrain-viewer.html",
     cover: "/case/terrain-viewer.png",
   },
+  {
+    title: "第十篇：光照",
+    url: "/case/light.html",
+    cover: "/case/light.png",
+  },
 ];

@@ -152,13 +152,13 @@ function initEventHandlers(canvas) {
   };
 
   //鼠标缩放
-  canvas.onmousewheel = function (event) {    
-    if (event.wheelDelta > 0) {
+  canvas.addEventListener('wheel', function (event) {
+    if (event.deltaY < 0) {   
       curScale = curScale * 1.1;
-    } else {
+    } else { 
       curScale = curScale * 0.9;
     }
-  };
+  }, { passive: true });
 }
 
 //设置MVP矩阵

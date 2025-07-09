@@ -44,4 +44,9 @@ export const caseData = [
     url: "/case/light.html",
     cover: "/case/light.png",
   },
+  {
+    title: "第十一篇：纹理",
+    url: "/case/texture.html",
+    cover: "/case/texture.png",
+  },
 ];

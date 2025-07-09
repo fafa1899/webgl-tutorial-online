@@ -2,26 +2,34 @@
 var VSHADER_SOURCE =
   'attribute vec4 a_Position;\n' + //位置
   'attribute vec4 a_Color;\n' + //颜色
+  'attribute vec4 a_Normal;\n' + //法向量
   'uniform mat4 u_MvpMatrix;\n' +
   'varying vec4 v_Color;\n' +
-  'varying vec4 v_position;\n' +
+  'varying vec4 v_Normal;\n' +
   'void main() {\n' +
-  '  v_position = a_Position;\n' +
-  '  gl_Position = u_MvpMatrix * a_Position;\n' + // 设置顶点坐标
+  '  gl_Position = u_MvpMatrix * a_Position;\n' + //设置顶点的坐标
   '  v_Color = a_Color;\n' +
+  '  v_Normal = a_Normal;\n' +
   '}\n';
 
 // 片元着色器程序
 var FSHADER_SOURCE =
   'precision mediump float;\n' +
-  'uniform vec2 u_RangeX;\n' + //X方向范围
-  'uniform vec2 u_RangeY;\n' + //Y方向范围
-  'uniform sampler2D u_Sampler;\n' +
+  'uniform vec3 u_DiffuseLight;\n' + // 漫反射光颜色
+  'uniform vec3 u_LightDirection;\n' + // 漫反射光的方向
+  'uniform vec3 u_AmbientLight;\n' + // 环境光颜色
   'varying vec4 v_Color;\n' +
-  'varying vec4 v_position;\n' +
+  'varying vec4 v_Normal;\n' +
   'void main() {\n' +
-  '  vec2 v_TexCoord = vec2((v_position.x-u_RangeX[0]) / (u_RangeX[1]-u_RangeX[0]), 1.0-(v_position.y-u_RangeY[0]) / (u_RangeY[1]-u_RangeY[0]));\n' +
-  '  gl_FragColor = texture2D(u_Sampler, v_TexCoord);\n' +
+  //对法向量归一化
+  '  vec3 normal = normalize(v_Normal.xyz);\n' +
+  //计算光线向量与法向量的点积
+  '  float nDotL = max(dot(u_LightDirection, normal), 0.0);\n' +
+  //计算漫发射光的颜色 
+  '  vec3 diffuse = u_DiffuseLight * v_Color.rgb * nDotL;\n' +
+  //计算环境光的颜色
+  '  vec3 ambient = u_AmbientLight * v_Color.rgb;\n' +
+  '  gl_FragColor = vec4(diffuse+ambient, v_Color.a);\n' +
   '}\n';
 
 //定义一个矩形体：混合构造函数原型模式
@@ -50,7 +58,22 @@ Cuboid.prototype = {
   },
   LengthY: function () {
     return (this.maxY - this.minY);
+  },
+  LengthZ: function () {
+    return (this.maxZ - this.minZ);
   }
+}
+
+//定义一个球体
+function Sphere(cuboid) {
+  this.centerX = cuboid.CenterX();
+  this.centerY = cuboid.CenterY();
+  this.centerZ = cuboid.CenterZ();
+  this.radius = Math.max(Math.max(cuboid.LengthX(), cuboid.LengthY()), cuboid.LengthZ()) / 2.0;
+}
+
+Sphere.prototype = {
+  constructor: Sphere
 }
 
 //定义DEM
@@ -65,7 +88,6 @@ Terrain.prototype = {
 
 var currentAngle = [0.0, 0.0]; // 绕X轴Y轴的旋转角度 ([x-axis, y-axis])
 var curScale = 1.0; //当前的缩放比例
-var initTexSuccess = false; //纹理图像是否加载完成
 
 function main() {
   //读取DEM文件
@@ -120,35 +142,28 @@ function main() {
 //绘制函数
 function onDraw(gl, canvas, terrain) {
   // 设置顶点位置
-  //var cuboid = new Cuboid(399589.072, 400469.072, 3995118.062, 3997558.062, 732, 1268); 
   var n = initVertexBuffers(gl, terrain);
   if (n < 0) {
     console.log('Failed to set the positions of the vertices');
     return;
   }
 
-  //设置纹理
-  if (!initTextures(gl, terrain)) {
-    console.log('Failed to intialize the texture.');
-    return;
-  }
-
   //注册鼠标事件
   initEventHandlers(canvas);
 
+  //设置灯光
+  var lightDirection = setLight(gl);
+
   //绘制函数
   var tick = function () {
-    if (initTexSuccess) {
-      //设置MVP矩阵
-      setMVPMatrix(gl, canvas, terrain.cuboid);
+    //设置MVP矩阵
+    setMVPMatrix(gl, canvas, terrain.sphere, lightDirection);
 
-      //清空颜色和深度缓冲区
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    //清空颜色和深度缓冲区
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-      //绘制矩形体
-      gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
-      //gl.drawArrays(gl.Points, 0, n);
-    }
+    //绘制矩形体
+    gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, 0);
 
     //请求浏览器调用tick
     requestAnimationFrame(tick);
@@ -158,67 +173,37 @@ function onDraw(gl, canvas, terrain) {
   tick();
 }
 
-function initTextures(gl, terrain) {
-  // 传递X方向和Y方向上的范围到着色器
-  var u_RangeX = gl.getUniformLocation(gl.program, 'u_RangeX');
-  var u_RangeY = gl.getUniformLocation(gl.program, 'u_RangeY');
-  if (!u_RangeX || !u_RangeY) {
-    console.log('Failed to get the storage location of u_RangeX or u_RangeY');
+//设置灯光
+function setLight(gl) {
+  var u_AmbientLight = gl.getUniformLocation(gl.program, 'u_AmbientLight');
+  var u_DiffuseLight = gl.getUniformLocation(gl.program, 'u_DiffuseLight');
+  var u_LightDirection = gl.getUniformLocation(gl.program, 'u_LightDirection');
+  if (!u_DiffuseLight || !u_LightDirection || !u_AmbientLight) {
+    console.log('Failed to get the storage location');
     return;
   }
-  gl.uniform2f(u_RangeX, terrain.cuboid.minX, terrain.cuboid.maxX);
-  gl.uniform2f(u_RangeY, terrain.cuboid.minY, terrain.cuboid.maxY);
 
-  //创建一个image对象
-  var image = new Image();
-  if (!image) {
-    console.log('Failed to create the image object');
-    return false;
-  }
-  //图像加载的响应函数 
-  image.onload = function () {
-    if (loadTexture(gl, image)) {
-      initTexSuccess = true;
-    }
-  };
+  //设置漫反射光
+  gl.uniform3f(u_DiffuseLight, 1.0, 1.0, 1.0);
 
-  //浏览器开始加载图像
-  image.src = 'tex.jpg';
+  // 设置光线方向(世界坐标系下的)
+  var solarAltitude = 45.0;
+  var solarAzimuth = 315.0;
+  var fAltitude = solarAltitude * Math.PI / 180; //光源高度角
+  var fAzimuth = solarAzimuth * Math.PI / 180; //光源方位角
 
-  return true;
-}
+  var arrayvectorX = Math.cos(fAltitude) * Math.cos(fAzimuth);
+  var arrayvectorY = Math.cos(fAltitude) * Math.sin(fAzimuth);
+  var arrayvectorZ = Math.sin(fAltitude);
 
-function loadTexture(gl, image) {
-  // 创建纹理对象
-  var texture = gl.createTexture();
-  if (!texture) {
-    console.log('Failed to create the texture object');
-    return false;
-  }
+  var lightDirection = new Vector3([arrayvectorX, arrayvectorY, arrayvectorZ]);
+  lightDirection.normalize(); // Normalize
+  gl.uniform3fv(u_LightDirection, lightDirection.elements);
 
-  // 开启0号纹理单元
-  gl.activeTexture(gl.TEXTURE0);
-  // 绑定纹理对象
-  gl.bindTexture(gl.TEXTURE_2D, texture);
+  //设置环境光
+  gl.uniform3f(u_AmbientLight, 0.2, 0.2, 0.2);
 
-  // 设置纹理参数
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-  // 配置纹理图像
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
-
-  // 将0号单元纹理传递给着色器中的取样器变量 
-  var u_Sampler = gl.getUniformLocation(gl.program, 'u_Sampler');
-  if (!u_Sampler) {
-    console.log('Failed to get the storage location of u_Sampler');
-    return false;
-  }
-  gl.uniform1i(u_Sampler, 0);
-
-  return true;
+  return lightDirection;
 }
 
 //读取DEM函数
@@ -243,24 +228,25 @@ function readDEMFile(result, terrain) {
 
   //读取点信息
   var ci = 0;
-  terrain.verticesColors = new Float32Array(verticeNum * 6);
+  var pSize = 9;
+  terrain.verticesColors = new Float32Array(verticeNum * pSize);
   for (var i = 1; i < stringlines.length; i++) {
     if (!stringlines[i]) {
       continue;
     }
 
     var subline = stringlines[i].split(',');
-    if (subline.length != 9) {
+    if (subline.length != pSize) {
       continue;
     }
 
-    for (var j = 0; j < 6; j++) {
+    for (var j = 0; j < pSize; j++) {
       terrain.verticesColors[ci] = parseFloat(subline[j]);
       ci++;
     }
   }
 
-  if (ci !== verticeNum * 6) {
+  if (ci !== verticeNum * pSize) {
     return false;
   }
 
@@ -272,15 +258,16 @@ function readDEMFile(result, terrain) {
   var minZ = terrain.verticesColors[2];
   var maxZ = terrain.verticesColors[2];
   for (var i = 0; i < verticeNum; i++) {
-    minX = Math.min(minX, terrain.verticesColors[i * 6]);
-    maxX = Math.max(maxX, terrain.verticesColors[i * 6]);
-    minY = Math.min(minY, terrain.verticesColors[i * 6 + 1]);
-    maxY = Math.max(maxY, terrain.verticesColors[i * 6 + 1]);
-    minZ = Math.min(minZ, terrain.verticesColors[i * 6 + 2]);
-    maxZ = Math.max(maxZ, terrain.verticesColors[i * 6 + 2]);
+    minX = Math.min(minX, terrain.verticesColors[i * pSize]);
+    maxX = Math.max(maxX, terrain.verticesColors[i * pSize]);
+    minY = Math.min(minY, terrain.verticesColors[i * pSize + 1]);
+    maxY = Math.max(maxY, terrain.verticesColors[i * pSize + 1]);
+    minZ = Math.min(minZ, terrain.verticesColors[i * pSize + 2]);
+    maxZ = Math.max(maxZ, terrain.verticesColors[i * pSize + 2]);
   }
 
   terrain.cuboid = new Cuboid(minX, maxX, minY, maxY, minZ, maxZ);
+  terrain.sphere = new Sphere(terrain.cuboid);
 
   return true;
 }
@@ -340,7 +327,7 @@ function initEventHandlers(canvas) {
 }
 
 //设置MVP矩阵
-function setMVPMatrix(gl, canvas, cuboid) {
+function setMVPMatrix(gl, canvas, sphere, lightDirection) {
   // Get the storage location of u_MvpMatrix
   var u_MvpMatrix = gl.getUniformLocation(gl.program, 'u_MvpMatrix');
   if (!u_MvpMatrix) {
@@ -353,22 +340,39 @@ function setMVPMatrix(gl, canvas, cuboid) {
   modelMatrix.scale(curScale, curScale, curScale);
   modelMatrix.rotate(currentAngle[0], 1.0, 0.0, 0.0); // Rotation around x-axis 
   modelMatrix.rotate(currentAngle[1], 0.0, 1.0, 0.0); // Rotation around y-axis 
-  modelMatrix.translate(-cuboid.CenterX(), -cuboid.CenterY(), -cuboid.CenterZ());
-
+  modelMatrix.translate(-sphere.centerX, -sphere.centerY, -sphere.centerZ);
+  
+  /*
+  //----------------------透视---------------------
   //投影矩阵
   var fovy = 60;
-  var near = 1;
   var projMatrix = new Matrix4();
   projMatrix.setPerspective(fovy, canvas.width / canvas.height, 1, 10000);
 
   //计算lookAt()函数初始视点的高度
   var angle = fovy / 2 * Math.PI / 180.0;
-  var eyeHight = (cuboid.LengthY() * 1.2) / 2.0 / angle;
+  var eyeHight = (sphere.radius * 2 * 1.1) / 2.0 / angle;
 
   //视图矩阵  
   var viewMatrix = new Matrix4(); // View matrix   
   viewMatrix.lookAt(0, 0, eyeHight, 0, 0, 0, 0, 1, 0);
+  //----------------------透视---------------------*/
+    
+  //----------------------正射---------------------
+  //视图矩阵  
+  var viewMatrix = new Matrix4();
+  var r = sphere.radius + 10;
+  viewMatrix.lookAt(lightDirection.elements[0] * r, lightDirection.elements[1] * r, lightDirection.elements[2] * r, 0, 0, 0, 0, 1, 0);
 
+  //投影矩阵
+  var projMatrix = new Matrix4();
+  var diameter = sphere.radius * 2.1;
+  var ratioWH = canvas.width / canvas.height;
+  var nearHeight = diameter;
+  var nearWidth = nearHeight * ratioWH;
+  projMatrix.setOrtho(-nearWidth / 2, nearWidth / 2, -nearHeight / 2, nearHeight / 2, 1, 10000);
+  //----------------------正射---------------------
+ 
   //MVP矩阵
   var mvpMatrix = new Matrix4();
   mvpMatrix.set(projMatrix).multiply(viewMatrix).multiply(modelMatrix);
@@ -426,7 +430,7 @@ function initVertexBuffers(gl, terrain) {
     return -1;
   }
   // 将缓冲区对象分配给a_Position变量
-  gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FSIZE * 6, 0);
+  gl.vertexAttribPointer(a_Position, 3, gl.FLOAT, false, FSIZE * 9, 0);
 
   // 连接a_Position变量与分配给它的缓冲区对象
   gl.enableVertexAttribArray(a_Position);
@@ -438,9 +442,19 @@ function initVertexBuffers(gl, terrain) {
     return -1;
   }
   // 将缓冲区对象分配给a_Color变量
-  gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, FSIZE * 6, FSIZE * 3);
+  gl.vertexAttribPointer(a_Color, 3, gl.FLOAT, false, FSIZE * 9, FSIZE * 3);
   // 连接a_Color变量与分配给它的缓冲区对象
   gl.enableVertexAttribArray(a_Color);
+
+  // 向缓冲区对象分配a_Normal变量,传入的这个变量要在着色器使用才行
+  var a_Normal = gl.getAttribLocation(gl.program, 'a_Normal');
+  if (a_Normal < 0) {
+    console.log('Failed to get the storage location of a_Normal');
+    return -1;
+  }
+  gl.vertexAttribPointer(a_Normal, 3, gl.FLOAT, false, FSIZE * 9, FSIZE * 6);
+  //开启a_Normal变量
+  gl.enableVertexAttribArray(a_Normal);
 
   // 将顶点索引写入到缓冲区对象
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);

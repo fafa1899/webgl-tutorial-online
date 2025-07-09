@@ -49,4 +49,9 @@ export const caseData = [
     url: "/case/texture.html",
     cover: "/case/texture.png",
   },
+  {
+    title: "第十二篇：包围球与投影",
+    url: "/case/spheres-projection.html",
+    cover: "/case/spheres-projection.png",
+  },
 ];

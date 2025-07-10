@@ -56,7 +56,17 @@ export const caseData = [
   },
   {
     title: "第十三篇：帧缓存对象(离屏渲染)",
-    url: "/case/spheres-projection.html",
-    cover: "/case/spheres-projection.png",
+    url: "/case/frame-buffer.html",
+    cover: "/case/frame-buffer.png",
+  },
+  {
+    title: "第十四篇：阴影",
+    url: "/case/shadow.html",
+    cover: "/case/shadow.png",
+  },
+  {
+    title: "第十五篇：加载gltf模型",
+    url: "/case/load-gltf.html",
+    cover: "/case/load-gltf.png",
   },
 ];

@@ -15,11 +15,13 @@ body {
 
     #toc-list-placeholder {
       width: 260px;
+      min-width: 260px;
       height: 100%; 
     }
 
     #case-placeholder {
       flex: 1;
+      min-width: 0;
       height: 100%;
     }
   }

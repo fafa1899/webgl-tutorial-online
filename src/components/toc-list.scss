@@ -7,8 +7,8 @@
   background-color: #2d2d2d;
   border-right: 1px solid #444;
   box-sizing: border-box;
-  overflow-y: auto; /* 如果内容超出容器高度则启用滚动 */
   gap: 10px;
+  height: 100%;
 
   .header-section {
     display: flex;
@@ -46,39 +46,56 @@
     }
   }
 
-  .toc-item {
+  .toc-list-content {
     display: flex;
-    flex-direction: row; /* 改为行布局，图标和文字并排 */
-    align-items: center; /* 垂直居中对齐 */
-    padding: 10px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    background-color: #3a3a3a; /* 卡片背景颜色 */
-    border: 1px solid #555; /* 更深一些的灰，比 #444 稍亮，但又不突兀 */
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch; /* 让子元素尽可能宽 */
+    gap: 10px;
+    overflow-y: auto; /* 如果内容超出容器高度则启用滚动 */
 
-    .toc-icon {
-      width: 32px;
-      height: 32px;
-      margin-right: 10px; /* 图标与文本之间留出空间 */
+    /* 彻底隐藏滚动条 */
+    -ms-overflow-style: none; // IE/Edge
+    scrollbar-width: none; // Firefox
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome/Safari/Edge
     }
 
-    .toc-title {
-      color: #f5f5f5; /* 文字颜色 */
-      font-size: 16px;
-      line-height: 1.2;
+    .toc-item {
+      display: flex;
+      flex-direction: row; /* 改为行布局，图标和文字并排 */
+      align-items: center; /* 垂直居中对齐 */
+      padding: 10px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      background-color: #3a3a3a; /* 卡片背景颜色 */
+      border: 1px solid #555; /* 更深一些的灰，比 #444 稍亮，但又不突兀 */
+
+      .toc-icon {
+        width: 32px;
+        height: 32px;
+        margin-right: 10px; /* 图标与文本之间留出空间 */
+      }
+
+      .toc-title {
+        color: #f5f5f5; /* 文字颜色 */
+        font-size: 16px;
+        line-height: 1.2;
+      }
     }
-  }
 
-  .toc-item:hover {
-    border-color: #00c6ff; /* 使用主题色亮蓝作为悬停边框色 */
-    box-shadow: 0 4px 14px rgba(0, 198, 255, 0.2); /* 配合轻微发光效果 */
-  }
+    .toc-item:hover {
+      border-color: #00c6ff; /* 使用主题色亮蓝作为悬停边框色 */
+      box-shadow: 0 4px 14px rgba(0, 198, 255, 0.2); /* 配合轻微发光效果 */
+    }
 
-  .toc-item.selected {
-    border-color: #00c6ff !important;
-    box-shadow: 0 0 0 0 rgba(0, 198, 255, 0.6),
-      0 4px 14px rgba(0, 198, 255, 0.4) !important;
-    background-color: #3f3f3f !important; /* 稍微提亮背景以突出边框 */
+    .toc-item.selected {
+      border-color: #00c6ff !important;
+      box-shadow: 0 0 0 0 rgba(0, 198, 255, 0.6),
+        0 4px 14px rgba(0, 198, 255, 0.4) !important;
+      background-color: #3f3f3f !important; /* 稍微提亮背景以突出边框 */
+    }
   }
 }

@@ -54,4 +54,9 @@ export const caseData = [
     url: "/case/spheres-projection.html",
     cover: "/case/spheres-projection.png",
   },
+  {
+    title: "第十三篇：帧缓存对象(离屏渲染)",
+    url: "/case/spheres-projection.html",
+    cover: "/case/spheres-projection.png",
+  },
 ];

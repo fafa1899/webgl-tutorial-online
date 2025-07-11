@@ -40,4 +40,11 @@ function main() {
 
   // 绘制一个点
   gl.drawArrays(gl.POINTS, 0, 1);
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', function () {   
+    resizeCanvasToDisplaySize(canvas);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.drawArrays(gl.POINTS, 0, 1);
+  });
 }

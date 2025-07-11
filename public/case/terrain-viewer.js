@@ -108,6 +108,12 @@ function main() {
 
   //清空颜色和深度缓冲区
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', function () {  
+    resizeCanvasToDisplaySize(canvas);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  });
 }
 
 //绘制函数

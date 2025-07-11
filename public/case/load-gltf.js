@@ -113,6 +113,12 @@ async function main() {
 
   //清空颜色和深度缓冲区
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', function () {  
+    resizeCanvasToDisplaySize(canvas);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  });
 }
 
 //绘制函数
@@ -226,15 +232,15 @@ function initEventHandlers(canvas) {
     }
     lastX = x, lastY = y;
   };
-
+ 
   //鼠标缩放
-  canvas.onmousewheel = function (event) {
-    if (event.wheelDelta > 0) {
+  canvas.addEventListener('wheel', function (event) {
+    if (event.deltaY < 0) {   
       curScale = curScale * 1.1;
-    } else {
+    } else { 
       curScale = curScale * 0.9;
     }
-  };
+  }, { passive: true });
 }
 
 //设置MVP矩阵

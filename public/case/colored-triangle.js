@@ -52,6 +52,13 @@ function main() {
 
   // 绘制三角形
   gl.drawArrays(gl.TRIANGLES, 0, n);
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', function () {   
+    resizeCanvasToDisplaySize(canvas);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.drawArrays(gl.TRIANGLES, 0, n);
+  });
 }
 
 function initVertexBuffers(gl) {

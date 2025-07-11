@@ -15,10 +15,10 @@ var FSHADER_SOURCE =
 
 function main() {
   // 获取 <canvas> 元素
-  var canvas = document.getElementById('webgl');
+  canvas = document.getElementById('webgl');
 
   // 获取WebGL渲染上下文
-  var gl = getWebGLContext(canvas);
+  gl = getWebGLContext(canvas);
   if (!gl) {
     console.log('Failed to get the rendering context for WebGL');
     return;
@@ -49,6 +49,13 @@ function main() {
 
   // 绘制三角形
   gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', function () {   
+    resizeCanvasToDisplaySize(canvas);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  });
 }
 
 function initVertexBuffers(gl) {

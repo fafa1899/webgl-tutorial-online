@@ -2,11 +2,13 @@
   width: 100%;
   height: 100%;
   display: flex;
+  flex-direction: row; // 默认桌面布局：左右分栏
 
   .left-panel,
   .right-panel {
     width: 50%;
-    padding: 10px;
+    padding: 0.5rem;
+    padding-left: 0;
     box-sizing: border-box;
   }
 
@@ -28,7 +30,7 @@
     pre {
       flex: 1;  
       background-color: #1a1a1a;
-      padding: 1em;
+      padding: 0.5rem;
       border-radius: 4px;
       white-space: pre-wrap;       // 允许自动换行
       word-wrap: break-word;       // 长单词/字符串换行
@@ -44,6 +46,17 @@
       display: block;
       max-width: 100%;
       overflow-x: auto;            // 长代码行水平滚动
+    }
+  }
+
+  // 手机竖屏样式：上下结构
+  @media (max-width: 767px) and (orientation: portrait) {
+    flex-direction: column;
+
+    .left-panel,
+    .right-panel {
+      height: 50%;
+      width: 100%; 
     }
   }
 }

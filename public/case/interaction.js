@@ -107,6 +107,12 @@ function main() {
 
   // 绘制矩形体
   gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_BYTE, 0);
+
+  // 监听窗口大小变化
+  window.addEventListener('resize', function () {  
+    resizeCanvasToDisplaySize(canvas);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  });
 }
 
 //注册鼠标事件
